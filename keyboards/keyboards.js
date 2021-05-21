@@ -19,9 +19,9 @@ const mainKeyboard = Markup.inlineKeyboard(
  
 function makeFloorsKeyboard(floors){
 return Markup.inlineKeyboard(
-  floors.map(floor=>{
+ [ ...floors.map(floor=>{
     return  [{ text: `${floor.name}`, callback_data: `checkBlocks_${floor.level}` },{ text: `${floor.image ? 'Посмотреть карту 🗺' : 'Карты этажа нет.'}`, callback_data: `${floor.image ? `getFloor_${floor.level}` : 'empty'}`},]
-  }))  
+  }),[ { text: "Вернуться назад ⬅️", callback_data: "main_scene" },]  ])  
 }
 function makeCurrentFloorKeyboard(floor){
  return Markup.inlineKeyboard( [
@@ -33,9 +33,9 @@ function makeCurrentFloorKeyboard(floor){
 }
 function makeBlocksKeyboard(blocks){
   return Markup.inlineKeyboard(
-    blocks.map(block=>{
+   [ ...blocks.map(block=>{
       return  [{ text: `${block.name} ${block.description}  `, callback_data: `getBlock_${block.position}` }]
-    }))  
+    }),     [ { text: "Вернуться назад ⬅️", callback_data: "checkFloors" },] ])
 }
 
 module.exports = {

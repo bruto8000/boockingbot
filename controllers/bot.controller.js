@@ -27,7 +27,20 @@ function errorSend(ctx) {
   );
 }
 function showMainKeyboard(ctx) {
-  ctx.reply("Выберите действие", keyboards.mainKeyboard);
+ 
+ 
+  if(ctx.session.lastScene == 'main'){
+    ctx.deleteMessage()
+ 
+
+  }
+  ctx.session.lastScene = 'main';
+  return ctx.reply("Выберите действие", keyboards.mainKeyboard);;
+ 
+
+}
+function setLastScene(ctx,scene){
+  ctx.session.lastScene = scene;
 }
 bot.hears(/^логин\s\w+/i, async (ctx) => {
   try {
@@ -110,16 +123,20 @@ bot.on("message", async (ctx) => {
   let user = ctx.session;
 
   if (!user.status) {
+    setLastScene(ctx,'')
     user.status = "needLogin";
   }
   if (!user.id || user.id != ctx.message.from.id) {
+    setLastScene(ctx,'')
     user.id = ctx.message.from.id;
   }
   if (user.status == "needLogin" || !user.status) {
+    setLastScene(ctx,'')
     ctx.reply(
       "Ваш аккаунт телеграм не связан с учеткой, введите ваш логин, в формате: \nЛогин Login"
     );
   } else if (user.status == "needToConfirmLogin") {
+    setLastScene(ctx,'')
     ctx.reply(
       `Мы отправили письмо вам на почту (${user.winlogin}) с кодом подтверждения. Введите его в формате:\nКод 1234`,
       keyboards.loginKeyboard
@@ -131,6 +148,7 @@ bot.on("message", async (ctx) => {
 
 
 bot.action("another_login", (ctx) => {
+  setLastScene(ctx,'')
   ctx.session.status = "needLogin";
   ctx.editMessageText("Введите новый логин, в формате: \nЛогин Login");
 
@@ -138,6 +156,7 @@ bot.action("another_login", (ctx) => {
 });
 
 bot.on("callback_query", (ctx, next) => {
+  setLastScene(ctx,'')
   next();
 });
 
@@ -164,7 +183,7 @@ bot.action("checkFloors", async (ctx) => {
       keyboards.makeFloorsKeyboard(floors)
     );
   } catch (err) {
-
+    ctx.deleteMessage()
     await ctx.replyWithPhoto({source :images.floors_logo}, keyboards.makeFloorsKeyboard(floors));
   }
   ctx.answerCbQuery();
@@ -182,6 +201,7 @@ bot.action(/checkBlocks_/, async (ctx) => {
       keyboard
     );
   } catch (err) {
+    ctx.deleteMessage()
     await ctx.replyWithPhoto(
       { source: images.blocks_logo },
       keyboard
@@ -199,7 +219,10 @@ bot.action("my_reservations", async (ctx) => {
   }
   ctx.answerCbQuery();
 });
-
+bot.action('main_scene', async (ctx)=>{
+  showMainKeyboard(ctx);
+  ctx.answerCbQuery();
+})
 
 
 bot.action(/getFloor_/, async (ctx) => {
@@ -213,6 +236,7 @@ bot.action(/getFloor_/, async (ctx) => {
       keyboards.makeCurrentFloorKeyboard(floors[0])
     );
   } catch (err) {
+    ctx.deleteMessage()
     await ctx.replyWithPhoto(
       { source: image },
       keyboards.makeCurrentFloorKeyboard(floors[0])
