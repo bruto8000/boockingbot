@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const blockSchema = new mongoose.Schema({
-  floor: Number,
+  level: Number,
   lockers: [
     [
       [
@@ -46,7 +46,7 @@ function createBlock({ indexFrom, parts, height, widthOfEachParth, names }) {
     });
   });
 }
-let floor2 = [
+let level2 = [
   createBlock({
     indexFrom: 201,
     parts: 2,
@@ -63,7 +63,7 @@ let floor2 = [
     names: "ПМ",
   }),
 ];
-let floor3 = [
+let level3 = [
   createBlock({
     indexFrom: 3001,
     parts: 3,
@@ -173,7 +173,7 @@ let floor3 = [
     })
   ),
 ];
-let floor4 = [
+let level4 = [
   createBlock({
     indexFrom: 4001,
     parts: 1,
@@ -309,25 +309,25 @@ let floor4 = [
 let {blockModel} =  require('../models/models')
 
 let idx = 1;
-blockModel.insertMany(floor2.map((lockers,idx)=>{
+blockModel.insertMany(level2.map((lockers,idx)=>{
     return {
         lockers,
         position: ++idx,
-        floor : 2
+        level : 2
     }
 }))
-blockModel.insertMany(floor3.map((lockers)=>{
+blockModel.insertMany(level3.map((lockers)=>{
     return {
         lockers,
         position: idx++,
-        floor : 3
+        level : 3
     }
 }))
-blockModel.insertMany(floor4.map((lockers)=>{
+blockModel.insertMany(level4.map((lockers)=>{
     return {
         lockers,
         position: idx++,
-        floor : 4
+        level : 4
     }
 }))
 }
