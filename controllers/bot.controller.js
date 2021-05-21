@@ -3,7 +3,8 @@ const { Telegraf } = require("telegraf");
 const fs = require("fs");
 const path = require("path");
 const images = {
-  floor_logo: fs.readFileSync(path.resolve(__dirname, '../images/floors/floors_logo.png')),
+  floors_logo: fs.readFileSync(path.resolve(__dirname, '../images/floors/floors_logo.png')),
+  blocks_logo: fs.readFileSync(path.resolve(__dirname, '../images/blocks/blocks_logo.png')),
 };
 const { errors } = require("../errors/errorcodes");
 // console.log(errors);
@@ -96,7 +97,7 @@ bot.hears(/^код\s\w+/i, async (ctx) => {
     ctx.reply("Вы успешно вошли в систему");
     showMainKeyboard(ctx);
   } catch (err) {
-    console.log(err);
+   
     if (errors[err.message]) {
       ctx.reply(errors[err.message]);
     } else {
@@ -140,12 +141,12 @@ bot.on("callback_query", (ctx, next) => {
   next();
 });
 
-bot.action("check_floors", async (ctx) => {
+bot.action("checkFloors", async (ctx) => {
   let floors;
   try {
     floors = await boocking.getFloors();
   } catch (err) {
-    console.log(err);
+    
     if (errors[err] || errors[err.message]) {
       ctx.reply(errors[err] || errors[err.message]);
     } else {
@@ -158,17 +159,37 @@ bot.action("check_floors", async (ctx) => {
     await ctx.editMessageMedia(
       {
         type: "photo",
-        media: { source: images.floor_logo },
+        media: { source: images.floors_logo },
       },
       keyboards.makeFloorsKeyboard(floors)
     );
   } catch (err) {
-  console.log(err)
-    await ctx.replyWithPhoto({source :images.floor_logo}, keyboards.makeFloorsKeyboard(floors));
+
+    await ctx.replyWithPhoto({source :images.floors_logo}, keyboards.makeFloorsKeyboard(floors));
   }
   ctx.answerCbQuery();
 });
 
+bot.action(/checkBlocks_/, async (ctx) => {
+  let level = ctx.update.callback_query.data.split("_")[1];
+  let blocks = await boocking.getBlocks( Number(level) );
+  let keyboard = keyboards.makeBlocksKeyboard(blocks);
+
+
+  try {
+    await ctx.editMessageMedia(
+      { type: "photo", media: { source: images.blocks_logo } },
+      keyboard
+    );
+  } catch (err) {
+    await ctx.replyWithPhoto(
+      { source: images.blocks_logo },
+      keyboard
+    );
+  }
+
+  ctx.answerCbQuery();
+})
 
 bot.action("my_reservations", async (ctx) => {
   try {
@@ -181,7 +202,7 @@ bot.action("my_reservations", async (ctx) => {
 
 
 
-bot.action(/getFloorImage_/, async (ctx) => {
+bot.action(/getFloor_/, async (ctx) => {
   let level = ctx.update.callback_query.data.split("_")[1];
   let floors = await boocking.getFloors( level );
   let image = floors[0].image;
@@ -189,12 +210,12 @@ bot.action(/getFloorImage_/, async (ctx) => {
   try {
     await ctx.editMessageMedia(
       { type: "photo", media: { source: image } },
-      keyboards.makeCurrentFloorKeyboard()
+      keyboards.makeCurrentFloorKeyboard(floors[0])
     );
   } catch (err) {
     await ctx.replyWithPhoto(
       { source: image },
-      keyboards.makeCurrentFloorKeyboard()
+      keyboards.makeCurrentFloorKeyboard(floors[0])
     );
   }
 

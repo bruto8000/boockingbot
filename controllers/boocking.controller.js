@@ -30,13 +30,35 @@ async function getFloors(level) {
   }
 }
 
+async function getBlocks(level) {
+    try {
+      let blocks = await boockingServices.getBlocks(level ? { level } : {});
+  
+      return blocks.map((block) => {
+          blockLastPart = block.lockers[block.lockers.length-1]
+          blockPreLastRow = blockLastPart[blockLastPart.length-2]
+          blockLastLocker = blockPreLastRow[blockPreLastRow.length-1]
+        return {
+          name: `Блок ${block.position}`,
+          description: `Локеры: ${block.lockers[0][0][0].lockerPosition}-${blockLastLocker.lockerPosition}`,
+        };
+      });
+    } catch (err) {
+      console.log(err);
+      if (errors[err] || errors[err.message]) {
+        throw new Error(errors[err] || errors[err.message]);
+      } else {
+        throw new Error("INVALIDERROR");
+      }
+    }
+}
 
 
-// getFloors(0).then(data=>{
-//    console.log(data)
-// })
+getBlocks(3).then(data=>{
+   console.log(data)
+})
 
 module.exports = {
   getFloors,
-
+  getBlocks
 };

@@ -8,7 +8,7 @@ const loginKeyboard = Markup.inlineKeyboard([{ text: "Ввести другой 
 const mainKeyboard = Markup.inlineKeyboard(
   [
     [
-      { text: "Посмотреть этажи", callback_data: "check_floors" },
+      { text: "Посмотреть этажи", callback_data: "checkFloors" },
       { text: "Мои записи", callback_data: "my_reservations" },
     ],
   ],
@@ -17,25 +17,31 @@ const mainKeyboard = Markup.inlineKeyboard(
   }
 )
  
-const makeFloorsKeyboard = function(floors){
+function makeFloorsKeyboard(floors){
 return Markup.inlineKeyboard(
   floors.map(floor=>{
-    return  [{ text: `${floor.name}`, callback_data: "check_floors" },{ text: `${floor.image ? 'Посмотреть карту 🗺' : 'Карты этажа нет.'}`, callback_data: `${floor.image ? `getFloorImage_${floor.level}` : 'empty'}`},]
+    return  [{ text: `${floor.name}`, callback_data: `checkBlocks_${floor.level}` },{ text: `${floor.image ? 'Посмотреть карту 🗺' : 'Карты этажа нет.'}`, callback_data: `${floor.image ? `getFloor_${floor.level}` : 'empty'}`},]
   }))  
 }
 function makeCurrentFloorKeyboard(floor){
  return Markup.inlineKeyboard( [
     [
-      { text: "Вернуться назад ⬅️", callback_data: "check_floors" },
-      { text: "Посмотреть блоки", callback_data: `check_blocks_${floor.level}` },
+      { text: "Вернуться назад ⬅️", callback_data: "checkFloors" },
+      { text: "Посмотреть блоки", callback_data: `checkBlocks_${floor.level}` },
     ],
   ])
 }
-
+function makeBlocksKeyboard(blocks){
+  return Markup.inlineKeyboard(
+    blocks.map(block=>{
+      return  [{ text: `${block.name} ${block.description}  `, callback_data: `getBlock_${block.position}` }]
+    }))  
+}
 
 module.exports = {
   loginKeyboard,
   mainKeyboard,
   makeFloorsKeyboard,
-  makeCurrentFloorKeyboard
+  makeCurrentFloorKeyboard,
+  makeBlocksKeyboard
 };
