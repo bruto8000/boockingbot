@@ -12,7 +12,7 @@ const lockerSchema = new mongoose.Schema({
 
 /// Create Lockers ///
 function createLockers() {
-  let lockerModel = mongoose.model("lockers", lockerSchema);
+  let {lockerModel} =  require('../models/models')
   let floor2 = new Array(24)
     .fill(0)
     .map((el, idx) => ({ position: ++idx + 200 }))

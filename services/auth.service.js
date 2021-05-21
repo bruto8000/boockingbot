@@ -1,9 +1,9 @@
 const connectionToDb = require("./mongoDB");
 const mongoose = require("mongoose");
-const { userSchema } = require("../schemas/user.schema");
+const { userModel } = require("../models/models");
 
 
-const userModel = mongoose.model("users", userSchema);
+
 
 
 const mailServices = require("./mail.service");

@@ -20,7 +20,7 @@ module.exports = {
 };
 
 
-
+/// Create Blocks ///
 function createBlocks(){
 
 
@@ -306,7 +306,8 @@ let floor4 = [
     names: new Array(8).fill("ОСО").concat(["ИНФО"]),
   }),
 ];
-let blockModel = mongoose.model("blocks", blockSchema);
+let {blockModel} =  require('../models/models')
+
 let idx = 1;
 blockModel.insertMany(floor2.map((lockers,idx)=>{
     return {
