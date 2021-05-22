@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 const lockerSchema = new mongoose.Schema({
   position: Number,
-  reservations: [
+  reservation: 
     {
       winlogin: String,
       from: Date,
       to: Date,
-    },
-  ],
+    }
+  
 });
 
 /// Create Lockers ///
