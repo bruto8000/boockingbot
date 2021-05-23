@@ -1,5 +1,4 @@
 const { Telegraf } = require("telegraf");
-
 const fs = require("fs");
 const path = require("path");
 const images = {
@@ -9,12 +8,10 @@ const images = {
 const { errors } = require("../errors/errorcodes");
 // console.log(errors);
 // const nodeHtmlToImage = require('node-html-to-image')
-
 const bot = new Telegraf(process.env.botlockers_token);
 const auth = require("./auth.controller");
 const boocking = require("./boocking.controller");
 const keyboards = require("../keyboards/keyboards");
-
 const { TelegrafMongoSession } = require("telegraf-session-mongodb");
 
 TelegrafMongoSession.setup(bot, "mongodb://localhost:27017/lockersDB")
@@ -27,17 +24,11 @@ function errorSend(ctx) {
   );
 }
 function showMainKeyboard(ctx) {
- 
- 
-  if(ctx.session.lastScene == 'main'){
+if(ctx.session.lastScene == 'main'){
     ctx.deleteMessage()
- 
-
-  }
+}
   ctx.session.lastScene = 'main';
-  return ctx.reply("Выберите действие", keyboards.mainKeyboard);;
- 
-
+  return ctx.reply("Выберите действие", keyboards.mainKeyboard);
 }
 function setLastScene(ctx,scene){
   ctx.session.lastScene = scene;
@@ -80,7 +71,6 @@ bot.hears(/^логин\s\w+/i, async (ctx) => {
     }
   }
 });
-
 bot.hears(/^код\s\w+/i, async (ctx) => {
   try {
     let tgUser = ctx.session;
@@ -118,7 +108,6 @@ bot.hears(/^код\s\w+/i, async (ctx) => {
     }
   }
 });
-
 bot.on("message", async (ctx) => {
   let user = ctx.session;
 
@@ -145,21 +134,28 @@ bot.on("message", async (ctx) => {
     showMainKeyboard(ctx);
   }
 });
-
-
 bot.action("another_login", (ctx) => {
   setLastScene(ctx,'')
   ctx.session.status = "needLogin";
   ctx.editMessageText("Введите новый логин, в формате: \nЛогин Login");
-
   ctx.answerCbQuery();
 });
-
 bot.on("callback_query", (ctx, next) => {
+  if(!ctx.session.status){
+    ctx.session.status = 'needLogin'
+    ctx.reply('Эта функция вам недоступна');
+    ctx.answerCbQuery();
+    return;
+  }else{
+    if(['needLogin','needToConfirmLogin'].includes(ctx.session.status)){
+      ctx.reply('Эта функция вам недоступна');
+      ctx.answerCbQuery();
+      return;
+    }
+  }
   setLastScene(ctx,'')
   next();
 });
-
 bot.action("checkFloors", async (ctx) => {
   let floors;
   try {
@@ -188,7 +184,6 @@ bot.action("checkFloors", async (ctx) => {
   }
   ctx.answerCbQuery();
 });
-
 bot.action(/checkBlocks_/, async (ctx) => {
   let level = ctx.update.callback_query.data.split("_")[1];
   let blocks = await boocking.getBlocks( Number(level) );
@@ -210,7 +205,6 @@ bot.action(/checkBlocks_/, async (ctx) => {
 
   ctx.answerCbQuery();
 })
-
 bot.action("my_reservations", async (ctx) => {
   try {
     await ctx.editMessageText("Смотрите мои записи", keyboards.mainKeyboard);
@@ -223,8 +217,6 @@ bot.action('main_scene', async (ctx)=>{
   showMainKeyboard(ctx);
   ctx.answerCbQuery();
 })
-
-
 bot.action(/getFloor_/, async (ctx) => {
   let level = ctx.update.callback_query.data.split("_")[1];
   let floors = await boocking.getFloors( level );
@@ -245,7 +237,49 @@ bot.action(/getFloor_/, async (ctx) => {
 
   ctx.answerCbQuery();
 });
+bot.action(/getBlock_\d+_\d+/, async (ctx) => {
+  console.log(ctx.update.callback_query.data)
+  let level = ctx.update.callback_query.data.split("_")[1];
+  let position = ctx.update.callback_query.data.split("_")[2];
+  let block = await boocking.getOneBlock( {position: Number(position),level :Number(level)} );
+  let keyboard = keyboards.makeCurrentBlockKeyboard(block);
+  ctx.replyWithPhoto('BLOCK', keyboard)
 
+
+
+  
+  try {
+    await ctx.editMessageMedia(
+      { type: "photo", media: { source: block.image } },
+      keyboard
+    );
+  } catch (err) {
+    ctx.deleteMessage()
+    await ctx.replyWithPhoto(
+      { source: block.image  },
+      keyboard
+    );
+  }
+
+  ctx.answerCbQuery();
+  // let image = floors[0].image;
+
+
+  // try {
+  //   await ctx.editMessageMedia(
+  //     { type: "photo", media: { source: image } },
+  //     keyboards.makeCurrentFloorKeyboard(floors[0])
+  //   );
+  // } catch (err) {
+  //   ctx.deleteMessage()
+  //   await ctx.replyWithPhoto(
+  //     { source: image },
+  //     keyboards.makeCurrentFloorKeyboard(floors[0])
+  //   );
+  // }
+
+  ctx.answerCbQuery();
+});
 module.exports = {
   bot,
 };

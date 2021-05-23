@@ -2,6 +2,9 @@ const boockingServices = require("../services/boocking.service");
 const { errors } = require("../errors/errorcodes");
 const fs = require("fs");
 const path = require("path");
+
+
+
 async function getFloors(level) {
   try {
     let floors = await boockingServices.getFloors(level ? { level } : {});
@@ -41,6 +44,8 @@ async function getBlocks(level) {
         return {
           name: `Блок ${block.position}`,
           description: `Локеры: ${block.lockers[0][0][0].lockerPosition}-${blockLastLocker.lockerPosition}`,
+          level: block.level,
+          position: block.position,
         };
       });
     } catch (err) {
@@ -54,11 +59,48 @@ async function getBlocks(level) {
 }
 
 
-getBlocks(3).then(data=>{
-   console.log(data)
-})
+async function getOneBlock({
+    position,
+    level
+}){
+let blocks =   await boockingServices.getBlocks({position,level});
+if(!blocks.length){
+  return null;
+}
+
+let block = blocks[0].toObject();
+let lockersInBlock =  block.lockers.flat(Infinity);
+let lockersPositions = lockersInBlock.map(el=>el.lockerPosition).filter(el=>!!el)
+let originalLockers = await boockingServices.getLockers({"position": {"$in": lockersPositions}})
+if(!originalLockers.length){
+  return null;
+}
+boockingServices.computeLockerColorsForBlock(lockersInBlock,originalLockers);
+
+let image = await boockingServices.makeImageFromArrayOfLockers(block.lockers)
+if(!image){
+  throw new Error('IMAGEERROR');
+}
+block.image = image
+
+// console.dir(block.lockers.map(part=>part.map(row=>row.map(locker=>({
+//   position: locker.lockerPosition,
+//   name: locker.name,
+// })))) ,{depth: 30})
+return block
+
+}
+// getOneBlock({
+//    position : 27,level: 4
+// })
+
+
+
+
+
 
 module.exports = {
   getFloors,
-  getBlocks
+  getBlocks,
+  getOneBlock
 };
