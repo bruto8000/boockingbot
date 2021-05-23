@@ -4,15 +4,15 @@ const lockerSchema = new mongoose.Schema({
   reservation: 
     {
       winlogin: String,
-      from: Date,
-      to: Date,
+      date: Date
     }
   
 });
 
 /// Create Lockers ///
-function createLockers() {
-  let {lockerModel} =  require('../models/models')
+async function  createLockers() {
+  let {lockerModel} =  require('../models/models');
+ await lockerModel.deleteMany({})
   let floor2 = new Array(24)
     .fill(0)
     .map((el, idx) => ({ position: ++idx + 200 }))
@@ -27,7 +27,11 @@ function createLockers() {
     .map((el, idx) => ({ position: ++idx + 4000 }));
   lockerModel.insertMany(floor2.concat(floor3).concat(floor4));
 }
-// createLockers()
+
+// setTimeout(() => {
+  
+//    createLockers()
+// }, 2000);
 
 module.exports = {
   lockerSchema,
