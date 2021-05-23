@@ -25,11 +25,8 @@ async function getFloors(level) {
     });
   } catch (err) {
     console.log(err);
-    if (errors[err] || errors[err.message]) {
-      throw new Error(errors[err] || errors[err.message]);
-    } else {
-      throw new Error("INVALIDERROR");
-    }
+    return [];
+  
   }
 }
 
@@ -50,15 +47,9 @@ async function getBlocks(level) {
       });
     } catch (err) {
       console.log(err);
-      if (errors[err] || errors[err.message]) {
-        throw new Error(errors[err] || errors[err.message]);
-      } else {
-        throw new Error("INVALIDERROR");
-      }
+      return [];
     }
 }
-
-
 async function getOneBlock({
     position,
     level
@@ -90,6 +81,16 @@ block.image = image
 return block
 
 }
+async function getLocker(position)
+{
+
+let lockers = await boockingServices.getLockers({position});
+let locker = lockers[0];
+
+return locker;
+
+
+}
 // getOneBlock({
 //    position : 27,level: 4
 // })
@@ -102,5 +103,6 @@ return block
 module.exports = {
   getFloors,
   getBlocks,
-  getOneBlock
+  getOneBlock,
+  getLocker
 };

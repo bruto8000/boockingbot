@@ -20,7 +20,7 @@ return blocks
 }
 async function getLockers(filter = {}){
     let lockers = await lockerModel.find(filter)
-return lockers
+return lockers.map(locker=>locker.toObject())
 }
 async function makeImageFromArrayOfLockers(arrayOfLockers){
     
@@ -67,7 +67,6 @@ async function makeImageFromArrayOfLockers(arrayOfLockers){
 
     <div id="main" class="main"></div>
     <script>
-      console.log("sik");
       let deepArrayOfLockers = JSON.parse( '${jsonnedArrayOfLockers}' )
       let mainElement = document.getElementById("main");
       let widthOfBody = deepArrayOfLockers.length * 40;
@@ -82,7 +81,6 @@ async function makeImageFromArrayOfLockers(arrayOfLockers){
             let lockerElement = document.createElement("div");
             j === 0 && lockersForWidth.push(lockerElement);
             lockerElement.classList.add("locker");
-            console.log(deepArrayOfLockers[i][j]);
             lockerElement.innerText =
               deepArrayOfLockers[i][j][k].lockerPosition || deepArrayOfLockers[i][j][k].name;
               lockerElement.style.color = deepArrayOfLockers[i][j][k].color;

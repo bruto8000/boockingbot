@@ -1,16 +1,18 @@
 const { Markup } = require("telegraf");
 
 const loginKeyboard = Markup.inlineKeyboard(
-  [{ text: "Ввести другой логин", callback_data: "another_login" }],
-  {
-    columns: parseInt(1),
-  }
-).resize();
+  [{ text: "Ввести другой логин", callback_data: "another_login" }]
+);
 
 const mainKeyboard = Markup.inlineKeyboard([
   [{ text: "Посмотреть этажи", callback_data: "checkFloors" }],
   [{ text: "Мои записи", callback_data: "my_reservations" }],
 ]);
+
+const gotoMainKeyboard = Markup.inlineKeyboard([
+  [{ text: "Вернуться на главную ⬅️", callback_data: "main_scene" }]
+
+])
 
 function makeFloorsKeyboard(floors) {
   return Markup.inlineKeyboard([
@@ -77,7 +79,12 @@ function makeCurrentBlockKeyboard(block) {
       ])
   );
 }
-
+function makeCurrentLockerKeyboard(locker,lastViewedBlock){
+ return Markup.inlineKeyboard([
+    [{ text: locker.isLockerOfCurrentTgUser ? 'Освободить' : 'Забронировать локер', callback_data: locker.isLockerOfCurrentTgUser ?  'drop_locker' :  `book_locker_${locker.position}` }],
+    [{ text: "Назад ⬅️", callback_data: `getBlock_${lastViewedBlock.level}_${lastViewedBlock.position}` }],
+  ])
+}
 module.exports = {
   makeCurrentBlockKeyboard,
   loginKeyboard,
@@ -85,4 +92,6 @@ module.exports = {
   makeFloorsKeyboard,
   makeCurrentFloorKeyboard,
   makeBlocksKeyboard,
+  gotoMainKeyboard,
+  makeCurrentLockerKeyboard
 };
