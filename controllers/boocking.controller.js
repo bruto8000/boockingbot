@@ -91,9 +91,15 @@ return locker;
 
 
 }
-// getOneBlock({
-//    position : 27,level: 4
-// })
+async function dropLocker(position){
+  let isDropped = await boockingServices.dropLocker({position});
+  return isDropped;
+}
+async function bookLocker(position, winlogin){
+  let isBooked = await boockingServices.bookLocker({position}, winlogin);
+  return isBooked; 
+}
+
 
 
 
@@ -104,5 +110,7 @@ module.exports = {
   getFloors,
   getBlocks,
   getOneBlock,
-  getLocker
+  getLocker,
+  dropLocker,
+  bookLocker
 };

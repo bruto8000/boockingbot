@@ -1,33 +1,26 @@
-const connectionToDb = require("./mongoDB");
-const mongoose = require("mongoose");
-const nodeHtmlToImage = require('node-html-to-image')
-const { userModel } = require("../models/models");
+
+const nodeHtmlToImage = require("node-html-to-image");
 const { floorModel } = require("../models/models");
 const { blockModel } = require("../models/models");
 const { lockerModel } = require("../models/models");
 
-
-
-
-async function getFloors(filter = {}){
-
-let floors = await floorModel.find(filter)
-return floors
+async function getFloors(filter = {}) {
+  let floors = await floorModel.find(filter);
+  return floors;
 }
-async function getBlocks(filter = {}){
-let blocks = await blockModel.find(filter)
-return blocks
+async function getBlocks(filter = {}) {
+  let blocks = await blockModel.find(filter);
+  return blocks;
 }
-async function getLockers(filter = {}){
-    let lockers = await lockerModel.find(filter)
-return lockers.map(locker=>locker.toObject())
+async function getLockers(filter = {}) {
+  let lockers = await lockerModel.find(filter);
+  return lockers.map((locker) => locker.toObject());
 }
-async function makeImageFromArrayOfLockers(arrayOfLockers){
-    
- let jsonnedArrayOfLockers = JSON.stringify(arrayOfLockers)
+async function makeImageFromArrayOfLockers(arrayOfLockers) {
+  let jsonnedArrayOfLockers = JSON.stringify(arrayOfLockers);
 
- let image = await nodeHtmlToImage({
-  html: `
+  let image = await nodeHtmlToImage({
+    html: `
   <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -99,32 +92,48 @@ async function makeImageFromArrayOfLockers(arrayOfLockers){
     </script>
   </body>
 </html>
-`
-});
-return image;
+`,
+  });
+  return image;
 }
-function computeLockerColorsForBlock(lockersInBlock, originalLockers){
-
-    lockersInBlock.forEach((lockerInBlock)=>{
-   
-      let originalLocker = originalLockers.find(locker=>locker.position == lockerInBlock.lockerPosition);
-       if(!originalLocker){
-        lockerInBlock.color = 'orange';
-         return;
-       }
-       if(originalLocker.reservation && originalLocker.reservation.winlogin){
-         lockerInBlock.color = 'red';
-       }else{
-        lockerInBlock.color = 'green';
-       }
-    })
-       return true;
+function computeLockerColorsForBlock(lockersInBlock, originalLockers) {
+  lockersInBlock.forEach((lockerInBlock) => {
+    let originalLocker = originalLockers.find(
+      (locker) => locker.position == lockerInBlock.lockerPosition
+    );
+    if (!originalLocker) {
+      lockerInBlock.color = "orange";
+      return;
+    }
+    if (originalLocker.reservation && originalLocker.reservation.winlogin) {
+      lockerInBlock.color = "red";
+    } else {
+      lockerInBlock.color = "green";
+    }
+  });
+  return true;
+}
+async function dropLocker(filter = null) {
+  if (!filter) {
+    return false;
   }
-module.exports = {
-    getFloors,
-    getBlocks,
-    getLockers,
-    makeImageFromArrayOfLockers,
-    computeLockerColorsForBlock
+
+  let updated = await lockerModel.updateOne(filter, { reservation: { winlogin: ''} });
+  return updated.n;
+}
+async function bookLocker(filter,winlogin){
+  let updated = await lockerModel.updateOne(filter, { reservation: { winlogin } });
+  return updated.n;
 }
 
+
+
+module.exports = {
+  getFloors,
+  getBlocks,
+  getLockers,
+  makeImageFromArrayOfLockers,
+  computeLockerColorsForBlock,
+  dropLocker,
+  bookLocker
+};

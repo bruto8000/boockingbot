@@ -5,7 +5,7 @@ console.log(`
 
 
 `)
-
+const connection = require('./services/mongoDB.js')
 const bot = require('./controllers/bot.controller')
 
 

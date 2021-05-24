@@ -6,7 +6,7 @@ const loginKeyboard = Markup.inlineKeyboard(
 
 const mainKeyboard = Markup.inlineKeyboard([
   [{ text: "Посмотреть этажи", callback_data: "checkFloors" }],
-  [{ text: "Мои записи", callback_data: "my_reservations" }],
+  [{ text: "Мой локер", callback_data: "my_reservation" }],
 ]);
 
 const gotoMainKeyboard = Markup.inlineKeyboard([
@@ -55,7 +55,6 @@ function makeCurrentBlockKeyboard(block) {
       .map((part) => {
         return part.map((row) => {
           return row.map((locker) => {
-            console.log(locker);
             return {
               text: `${locker.lockerPosition || locker.name}`,
               callback_data: `${
@@ -82,7 +81,7 @@ function makeCurrentBlockKeyboard(block) {
 function makeCurrentLockerKeyboard(locker,lastViewedBlock){
  return Markup.inlineKeyboard([
     [{ text: locker.isLockerOfCurrentTgUser ? 'Освободить' : 'Забронировать локер', callback_data: locker.isLockerOfCurrentTgUser ?  'drop_locker' :  `book_locker_${locker.position}` }],
-    [{ text: "Назад ⬅️", callback_data: `getBlock_${lastViewedBlock.level}_${lastViewedBlock.position}` }],
+    [{ text: "Назад ⬅️", callback_data: lastViewedBlock ? `getBlock_${lastViewedBlock.level}_${lastViewedBlock.position}` : 'main_scene' }],
   ])
 }
 module.exports = {
