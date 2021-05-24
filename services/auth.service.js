@@ -1,12 +1,11 @@
-const connectionToDb = require("./mongoDB");
-const mongoose = require("mongoose");
+
 const { userModel } = require("../models/models");
 
 
 
 
 
-const mailServices = require("./mail.service");
+// const mailServices = require("./mail.service");
 
 async function checkLogged(telegramId) {
   let founded = await userModel.findOne({ telegramId });
@@ -31,7 +30,7 @@ async function sendConfirmationCode(winlogin) {
     CSC: user._doc.CSC,
     subject: "Код подтверждения",
     body: `<b>Код подтверждения к системе бронирования</b><br> Уважаемый пользователь, вы получили это сообщение,
-       так как пытались связать свой телеграм аккаунт с учектой. Если это так, то введите код <b>${confirmCode}</b> в телеграме.`, // html body
+       так как пытались связать свой телеграм аккаунт с учеткой. Если это так, то введите код <b>${confirmCode}</b> в телеграме.`, // html body
   });
 
   if (!isSended) {

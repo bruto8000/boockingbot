@@ -17,7 +17,6 @@ async function sendConfirmationCode({ winlogin, tgUser }) {
 
   if (isSended) {
     tgUser.winlogin = winlogin;
-    tgUser.isLoginConfirmed = false;
     tgUser.status = 'needToConfirmLogin';
   }
   return !!isSended
